@@ -1,20 +1,26 @@
 import './App.css';
 import { connect } from 'react-redux'
 import Good from './components/good'
+import { useEffect } from 'react'
+import {getAllItems, shopAddItem} from './store/shop/actions'
+import { cartAddItem } from './store/user/actions'
 
-import { addItem, deleteItem } from './store/shop/actions'
-
-function App({ items, addItem, cart }) {
+function App({ items, shopAddItem, cartAddItem, cart, getAllItems }) {
   const submit = evt => {
     evt.preventDefault()
     const form = evt.target
     const { title, price, img } = form.elements
-    addItem({
+    shopAddItem({
       title: title.value,
       img: img.value,
       price: price.value
     })
   }
+
+  useEffect(_ => {
+    getAllItems()
+  }, [])
+
   return (
     <div className="App">
       <header className="AppHeader">
@@ -22,8 +28,8 @@ function App({ items, addItem, cart }) {
         <div>Cart Items: {cart.length}</div>
       </header>
       <main>
-        {items.map((item, index) => {
-          return <Good key={index} {...item} />
+        {items.map(item => {
+          return <Good {...item} key={item.title} onClick={_ => cartAddItem(item)}/>
         })}
       </main>
       <form className='AppForm' onSubmit={submit}>
@@ -39,16 +45,20 @@ function App({ items, addItem, cart }) {
 const mapStateToProps = ({ shop, user }) => {
   return {
     items: shop.data,
-    cart: user.cart
+    cart: user.cart,
   }
 }
+
 const mapDispatchToProps = (dispatch) => {
   return {
-    addItem: (item) => {
-      dispatch(addItem(item))
+    shopAddItem: (item) => {
+      dispatch(shopAddItem(item))
     },
-    onDecrement: (id) => {
-      dispatch(deleteItem(id))
+    cartAddItem: (item) => {
+      dispatch(cartAddItem(item))
+    },
+    getAllItems: () => {
+      dispatch(getAllItems())
     }
   }
 }
