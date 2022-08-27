@@ -2,10 +2,11 @@ import './App.css';
 import { connect } from 'react-redux'
 import Good from './components/good'
 import { useEffect } from 'react'
-import {getAllItems, shopAddItem} from './store/shop/actions'
+import { shopAddItemSaga, getAllItems } from './store/shop/actions'
 import { cartAddItem } from './store/user/actions'
+import totalPrice from './selectors/get-total'
 
-function App({ items, shopAddItem, cartAddItem, cart, getAllItems }) {
+function App({ items, shopAddItem, cartAddItem, cart, getAllItems, totalPrice }) {
   const submit = evt => {
     evt.preventDefault()
     const form = evt.target
@@ -17,6 +18,7 @@ function App({ items, shopAddItem, cartAddItem, cart, getAllItems }) {
     })
   }
 
+  console.log({ totalPrice })
   useEffect(_ => {
     getAllItems()
   }, [])
@@ -46,13 +48,14 @@ const mapStateToProps = ({ shop, user }) => {
   return {
     items: shop.data,
     cart: user.cart,
+    totalPrice: totalPrice(user)
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     shopAddItem: (item) => {
-      dispatch(shopAddItem(item))
+      dispatch(shopAddItemSaga(item))
     },
     cartAddItem: (item) => {
       dispatch(cartAddItem(item))
